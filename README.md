@@ -83,13 +83,14 @@ This command will open a TTY to a shell in your pod. It is like SSH for containe
 
     $ kubectl exec nginx-pod -it bash
 
-This opens a bash shell and allows you to look around the filesystem of the container.
+This opens a bash shell and allows you to look around the filesystem of the container. You can for example navigate to the config file of nginx and take a look at it.
 
-* TODO Do something in the container
+    $ cd /etc/nginx
+    $ cat nginx.conf
 
 ### Editing the pod
 
-You can change the image tag e.g. or other parameters and the pod will be recreated (`kubectl edit pod nginx-pod`). But this would cause a downtime. It is kind of simply running `docker run` on a server. 
+You can change the image tag e.g. or other parameters and the container will be recreated (`kubectl edit pod nginx-pod`). But this would cause a downtime. It is kind of simply running `docker run` on a server. 
 
 The fun using kubernetes comes with `deployments`!
 
@@ -161,7 +162,39 @@ You can also take a look at the created manifest file.
     $ kubectl get service nginx-deployment -o yaml
 
 ## Tasks
-* TODO: Change Deployment (Replicas, Image, Resources)
+
+Now play around with the deployment. Do it in the yaml file and use `kubectl apply ...` or use `kubectl --help` to find ways to change a deployment without a yaml file.
+
+### Simple Tasks
+* Scale the deployment from 3 to 5 replicas
+* Change the Deployment Strategy to `Recreate` and watch how the deployment behavior changes when you set another image. (`watch -n1 kubectl get pods`, don't have the `watch` command: `brew install watch`)
+
+### Challenge
+
+Now that you have been guided so much. Here comes a challenge for you. 
+Create a broken deployment:
+
+    $ kubectl create -f broken-deployment.yml
+
+You should see something like this:
+
+    $ kubectl get pods
+    NAME                                 READY   STATUS    RESTARTS   AGE
+    broken-deployment-55db7fb997-8ztjr   0/1     Pending   0          50s
+    broken-deployment-55db7fb997-pw98w   0/1     Pending   0          50s
+    broken-deployment-55db7fb997-tx7wz   1/1     Running   0          50s
+    broken-deployment-55db7fb997-vlckl   0/1     Pending   0          50s
+    broken-deployment-55db7fb997-vlld8   0/1     Pending   0          50s
+
+When a Pod is in `Pending` state, there is something wrong and the pod cannot be scheduled to a worker. You can figure out the "why" by using `kubectl describe`. Then fix the deployment (all Pods in state `Running`) and feel like a real hero!
+
+Bonus points: Find a well suited solution - not only fix the problem, but do it in an informed  
+
+
+### Workshop outro
+
+You are already done? Nice! Then try out some stuff on your own ... OR ... start a pod based on this image `pengbai/docker-supermario` and have some fun with super mario running on Kubernetes ;-)
+
 
 ## Clean up
 Delete all the Kubernetes resources created so far:
