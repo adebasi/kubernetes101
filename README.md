@@ -78,18 +78,21 @@ Take a look at the nginx container log. You can see the access log there:
     127.0.0.1 - - [15/Jan/2020:18:43:45 +0000] "GET / HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36" "-"
 
 ### Execute a shell on the running pod
-This command will open a TTY to a shell in your pod:
 
-    $ kubectl get pods
+This command will open a TTY to a shell in your pod. It is like SSH for containers.
+
     $ kubectl exec nginx-pod -it bash
 
 This opens a bash shell and allows you to look around the filesystem of the container.
 
 * TODO Do something in the container
 
-You can change the image tag e.g. or other parameters and the pod will be recreated (`kubectl edit pod nginx-pod`). But this would cause a downtime. It is close to simply running `docker run` on a server. 
+### Editing the pod
+
+You can change the image tag e.g. or other parameters and the pod will be recreated (`kubectl edit pod nginx-pod`). But this would cause a downtime. It is kind of simply running `docker run` on a server. 
 
 The fun using kubernetes comes with `deployments`!
+
 
 ## Deployments
 
@@ -127,8 +130,6 @@ By default, pods are created in a default namespace. In addition, a kube-system 
     kube-controller-manager-docker-desktop   1/1     Running   1          2d23h
     kube-proxy-h4d54                         1/1     Running   1          2d23h
     kube-scheduler-docker-desktop            1/1     Running   1          2d23h
-    
-* TODO: Change Deployment (Replicas, Image, Resources)
 
 
 ## Service
@@ -145,13 +146,13 @@ A Kubernetes service defines a logical set of pods and enables them to be access
 
 You can create a service with a manifest file or let `kubectl` do the work:
 
-$ kubectl expose deployment nginx-deployment --type=NodePort
-service/nginx-deployment exposed
+    $ kubectl expose deployment nginx-deployment --type=NodePort
+    service/nginx-deployment exposed
 
-$ kubectl get service
-NAME               TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
-kubernetes         ClusterIP   10.96.0.1       <none>        443/TCP        3d
-nginx-deployment   NodePort    10.107.148.24   <none>        80:30849/TCP   5m44s
+    $ kubectl get service
+    NAME               TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+    kubernetes         ClusterIP   10.96.0.1       <none>        443/TCP        3d
+    nginx-deployment   NodePort    10.107.148.24   <none>        80:30849/TCP   5m44s
 
 Kubernetes provided by Docker for Mac lets you access NodePort services via `localhost`. The service in the example can be accessed by `localhost:30849`. Give it a try.
 
@@ -159,9 +160,13 @@ You can also take a look at the created manifest file.
 
     $ kubectl get service nginx-deployment -o yaml
 
+## Tasks
+* TODO: Change Deployment (Replicas, Image, Resources)
+
 ## Clean up
 Delete all the Kubernetes resources created so far:
 
     $ kubectl get all
     $ kubectl delete deployment my-deployment
-    $ ... TODO other resources
+    $ kubectl delete service nginx-deployment
+    $ ...
